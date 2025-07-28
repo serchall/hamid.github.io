@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تست ویجت چت</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .test-container {
+            padding: 50px 20px;
+            color: white;
+        }
+        
+        .test-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .test-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-list i {
+            margin-left: 10px;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container test-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="text-center mb-5">
+                    <h1 class="display-4 mb-3">🧪 تست ویجت چت</h1>
+                    <p class="lead">ویجت چت درون‌برنامه‌ای با قابلیت چت زنده</p>
+                </div>
+                
+                <div class="test-card">
+                    <h3><i class="fas fa-cogs me-2"></i>کنترل‌های تست</h3>
+                    <div class="text-center">
+                        <button class="test-button" onclick="window.chatWidget.open()">
+                            <i class="fas fa-comments me-1"></i>باز کردن چت
+                        </button>
+                        <button class="test-button" onclick="window.chatWidget.close()">
+                            <i class="fas fa-times me-1"></i>بستن چت
+                        </button>
+                        <button class="test-button" onclick="testAutoResponse()">
+                            <i class="fas fa-robot me-1"></i>تست پاسخ خودکار
+                        </button>
+                        <button class="test-button" onclick="testNotification()">
+                            <i class="fas fa-bell me-1"></i>تست اعلان
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="test-card">
+                    <h3><i class="fas fa-star me-2"></i>ویژگی‌های ویجت</h3>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i>طراحی مدرن و زیبا با انیمیشن‌های نرم</li>
+                        <li><i class="fas fa-check-circle"></i>چت زنده با Socket.IO</li>
+                        <li><i class="fas fa-check-circle"></i>نمایش وضعیت اتصال (آنلاین/آفلاین)</li>
+                        <li><i class="fas fa-check-circle"></i>نشانگر تایپ کردن</li>
+                        <li><i class="fas fa-check-circle"></i>اعلان‌های پیام جدید</li>
+                        <li><i class="fas fa-check-circle"></i>ذخیره پیام‌ها در localStorage</li>
+                        <li><i class="fas fa-check-circle"></i>پاسخ‌های خودکار برای سوالات رایج</li>
+                        <li><i class="fas fa-check-circle"></i>طراحی واکنش‌گرا برای موبایل</li>
+                        <li><i class="fas fa-check-circle"></i>پشتیبانی از حالت تاریک</li>
+                        <li><i class="fas fa-check-circle"></i>امنیت XSS و محافظت از ورودی‌ها</li>
+                    </ul>
+                </div>
+                
+                <div class="test-card">
+                    <h3><i class="fas fa-info-circle me-2"></i>نحوه استفاده</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>برای کاربران:</h5>
+                            <ul class="feature-list">
+                                <li><i class="fas fa-arrow-right"></i>روی دکمه چت کلیک کنید</li>
+                                <li><i class="fas fa-arrow-right"></i>پیام خود را بنویسید</li>
+                                <li><i class="fas fa-arrow-right"></i>Enter یا دکمه ارسال را بزنید</li>
+                                <li><i class="fas fa-arrow-right"></i>پاسخ‌های خودکار دریافت کنید</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>برای توسعه‌دهندگان:</h5>
+                            <ul class="feature-list">
+                                <li><i class="fas fa-code"></i>window.chatWidget.open()</li>
+                                <li><i class="fas fa-code"></i>window.chatWidget.close()</li>
+                                <li><i class="fas fa-code"></i>window.chatWidget.send('پیام')</li>
+                                <li><i class="fas fa-code"></i>کاملاً قابل شخصی‌سازی</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="test-card">
+                    <h3><i class="fas fa-terminal me-2"></i>کد نمونه</h3>
+                    <pre style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; color: #fff; font-size: 12px;">
+// باز کردن چت
+window.chatWidget.open();
+
+// بستن چت
+window.chatWidget.close();
+
+// ارسال پیام
+window.chatWidget.send('سلام');
+
+// اضافه کردن به صفحه
+&lt;link rel="stylesheet" href="chat-widget.css"&gt;
+&lt;script src="/socket.io/socket.io.js"&gt;&lt;/script&gt;
+&lt;script src="chat-widget.js"&gt;&lt;/script&gt;</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Widget -->
+    <link rel="stylesheet" href="chat-widget.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="chat-widget.js"></script>
+    
+    <script>
+        // Test functions
+        function testAutoResponse() {
+            const testMessages = [
+                'سلام',
+                'قیمت',
+                'ساعت کاری',
+                'ارسال',
+                'بازگشت',
+                'خداحافظ'
+            ];
+            
+            const randomMessage = testMessages[Math.floor(Math.random() * testMessages.length)];
+            window.chatWidget.send(randomMessage);
+        }
+        
+        function testNotification() {
+            // Simulate incoming message
+            setTimeout(() => {
+                window.chatWidget.addMessage('این یک پیام تست است!', 'bot');
+            }, 1000);
+        }
+        
+        // Auto-open chat after 3 seconds for demo
+        setTimeout(() => {
+            if (window.chatWidget) {
+                window.chatWidget.open();
+            }
+        }, 3000);
+    </script>
+</body>
+</html> 

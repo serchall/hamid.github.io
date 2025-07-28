@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جزئیات دوره</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: #f8f9fa;
+        }
+        .course-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 0;
+        }
+        .content-item {
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+        .content-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 0;
+            padding-bottom: 56.25%;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 10px;
+        }
+        .content-type-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="course-header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-4">
+                    <img id="courseImage" src="" alt="تصویر دوره" class="img-fluid rounded" style="max-height: 200px; width: 100%; object-fit: cover;">
+                </div>
+                <div class="col-md-8">
+                    <h1 id="courseTitle" class="mb-3"></h1>
+                    <p id="courseDescription" class="lead mb-3"></p>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <i class="fas fa-user me-2"></i>
+                            <span id="courseInstructor"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-clock me-2"></i>
+                            <span id="courseDuration"></span> دقیقه
+                        </div>
+                        <div class="col-md-4">
+                            <i class="fas fa-signal me-2"></i>
+                            <span id="courseLevel"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3><i class="fas fa-play-circle me-2"></i>محتوای دوره</h3>
+                        <div id="progressBarContainer" style="width:200px;">
+                            <div class="progress" style="height: 20px;">
+                                <div id="progressBar" class="progress-bar bg-success" role="progressbar" style="width:0%">0%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" id="courseContent">
+                        <!-- محتوای دوره اینجا لود می‌شود -->
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h4><i class="fas fa-info-circle me-2"></i>اطلاعات دوره</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success btn-lg">
+                                <i class="fas fa-shopping-cart me-2"></i>
+                                خرید دوره
+                            </button>
+                            <button class="btn btn-outline-primary">
+                                <i class="fas fa-heart me-2"></i>
+                                افزودن به علاقه‌مندی‌ها
+                            </button>
+                        </div>
+                        <hr>
+                        <div class="text-center">
+                            <h5 class="text-danger" id="coursePrice"></h5>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- بخش آزمون‌ها -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h4><i class="fas fa-question-circle me-2"></i>آزمون‌های دوره</h4>
+                    </div>
+                    <div class="card-body" id="quizzesSection">
+                        <!-- آزمون‌ها اینجا لود می‌شوند -->
+                    </div>
+                </div>
+
+                <!-- بخش گواهی پایان دوره -->
+                <div class="card mt-3">
+                    <div class="card-header">
+                        <h4><i class="fas fa-certificate me-2"></i>گواهی پایان دوره</h4>
+                    </div>
+                    <div class="card-body" id="certificateSection">
+                        <!-- وضعیت گواهی اینجا نمایش داده می‌شود -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let courseContentList = [];
+        let completedContentIds = [];
+        let courseId = null;
+        let userToken = localStorage.getItem('authToken');
+
+        async function loadCourseDetail() {
+            const urlParams = new URLSearchParams(window.location.search);
+            courseId = urlParams.get('id');
+            if (!courseId) {
+                alert('شناسه دوره یافت نشد');
+                return;
+            }
+            try {
+                const response = await fetch(`/api/courses/${courseId}`);
+                const data = await response.json();
+                if (data.success) {
+                    const course = data.course;
+                    const content = data.content;
+                    courseContentList = content;
+                    // پر کردن اطلاعات دوره
+                    document.getElementById('courseTitle').textContent = course.title;
+                    document.getElementById('courseDescription').textContent = course.description;
+                    document.getElementById('courseInstructor').textContent = course.instructor;
+                    document.getElementById('courseDuration').textContent = course.duration;
+                    document.getElementById('courseLevel').textContent = getLevelText(course.level);
+                    document.getElementById('coursePrice').textContent = course.price.toLocaleString() + ' تومان';
+                    document.getElementById('courseImage').src = course.image;
+                    // نمایش محتوای دوره
+                    renderCourseContent(content);
+                    // دریافت پیشرفت کاربر
+                    if (userToken) loadProgress();
+                    // بارگذاری آزمون‌ها
+                    loadQuizzes();
+                    // بارگذاری وضعیت گواهی
+                    loadCertificateStatus();
+                } else {
+                    alert('خطا در بارگذاری دوره: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error loading course:', error);
+                alert('خطا در ارتباط با سرور');
+            }
+        }
+
+        async function loadQuizzes() {
+            try {
+                const response = await fetch(`/api/courses/${courseId}/quizzes`, {
+                    headers: { 'Authorization': `Bearer ${userToken}` }
+                });
+                const data = await response.json();
+                if (data.success) {
+                    renderQuizzes(data.quizzes);
+                }
+            } catch (error) {
+                console.error('Error loading quizzes:', error);
+            }
+        }
+
+        function renderQuizzes(quizzes) {
+            const container = document.getElementById('quizzesSection');
+            if (!quizzes || quizzes.length === 0) {
+                container.innerHTML = '<p class="text-muted">هنوز آزمونی برای این دوره تعریف نشده است.</p>';
+                return;
+            }
+            container.innerHTML = quizzes.map(quiz => `
+                <div class="quiz-item mb-3 p-3 border rounded">
+                    <h6>${quiz.title}</h6>
+                    <p class="text-muted small">${quiz.description}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge bg-info">${quiz.time_limit} دقیقه</span>
+                        <button class="btn btn-sm btn-primary" onclick="startQuiz(${quiz.id})">
+                            شروع آزمون
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function startQuiz(quizId) {
+            if (!userToken) {
+                alert('برای شرکت در آزمون ابتدا وارد شوید');
+                return;
+            }
+            window.open(`/quiz.html?id=${quizId}`, '_blank');
+        }
+
+        function renderCourseContent(content) {
+            const container = document.getElementById('courseContent');
+            if (!content || content.length === 0) {
+                container.innerHTML = '<p class="text-muted">هنوز محتوایی برای این دوره اضافه نشده است.</p>';
+                return;
+            }
+            container.innerHTML = content.map((item, index) => {
+                const isCompleted = completedContentIds.includes(item.id);
+                if (item.type === 'video') {
+                    return `
+                        <div class="content-item ${isCompleted ? 'bg-light' : ''}" onclick="markContentCompleted(${item.id})">
+                            <div class="position-relative">
+                                <div class="video-container">
+                                    <iframe src="${item.content}" frameborder="0" allowfullscreen></iframe>
+                                </div>
+                                <span class="badge bg-danger content-type-badge">
+                                    <i class="fas fa-play"></i> ویدئو
+                                </span>
+                            </div>
+                            <div class="p-3">
+                                <h5>${index + 1}. ${item.title} ${isCompleted ? '<span class=\'badge bg-success\'>مشاهده شد</span>' : ''}</h5>
+                            </div>
+                        </div>
+                    `;
+                } else if (item.type === 'file') {
+                    return `
+                        <div class="content-item ${isCompleted ? 'bg-light' : ''}" onclick="markContentCompleted(${item.id})">
+                            <div class="p-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-file-pdf fa-2x text-danger me-3"></i>
+                                    <div class="flex-grow-1">
+                                        <h5>${index + 1}. ${item.title} ${isCompleted ? '<span class=\'badge bg-success\'>دانلود شد</span>' : ''}</h5>
+                                        <p class="text-muted mb-0">فایل PDF آموزشی</p>
+                                    </div>
+                                    <a href="${item.file_path}" class="btn btn-outline-primary" target="_blank">
+                                        <i class="fas fa-download me-1"></i>
+                                        دانلود
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    return `
+                        <div class="content-item ${isCompleted ? 'bg-light' : ''}" onclick="markContentCompleted(${item.id})">
+                            <div class="p-3">
+                                <h5>${index + 1}. ${item.title} ${isCompleted ? '<span class=\'badge bg-success\'>خوانده شد</span>' : ''}</h5>
+                                <p class="text-muted">${item.content}</p>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        function markContentCompleted(contentId) {
+            if (!userToken) return;
+            if (!completedContentIds.includes(contentId)) {
+                completedContentIds.push(contentId);
+                saveProgress();
+                renderCourseContent(courseContentList);
+            }
+        }
+
+        async function loadProgress() {
+            const res = await fetch(`/api/courses/${courseId}/progress`, { headers: { 'Authorization': `Bearer ${userToken}` } });
+            const data = await res.json();
+            if (data.success && data.progress) {
+                completedContentIds = JSON.parse(data.progress.completed_content_ids || '[]');
+                updateProgressBar(data.progress.progress_percent || 0);
+                renderCourseContent(courseContentList);
+            }
+        }
+
+        async function saveProgress() {
+            const percent = Math.round((completedContentIds.length / courseContentList.length) * 100);
+            updateProgressBar(percent);
+            await fetch(`/api/courses/${courseId}/progress`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userToken}`
+                },
+                body: JSON.stringify({
+                    completedContentIds,
+                    progressPercent: percent
+                })
+            });
+        }
+
+        function updateProgressBar(percent) {
+            const bar = document.getElementById('progressBar');
+            bar.style.width = percent + '%';
+            bar.textContent = percent + '%';
+        }
+
+        function getLevelText(level) {
+            switch(level) {
+                case 'beginner': return 'مبتدی';
+                case 'intermediate': return 'متوسط';
+                case 'advanced': return 'پیشرفته';
+                default: return 'نامشخص';
+            }
+        }
+
+        async function loadCertificateStatus() {
+            if (!userToken) return;
+            
+            try {
+                const response = await fetch(`/api/courses/${courseId}/certificate/eligibility`, {
+                    headers: { 'Authorization': `Bearer ${userToken}` }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    renderCertificateStatus(data);
+                }
+            } catch (error) {
+                console.error('Error loading certificate status:', error);
+            }
+        }
+
+        function renderCertificateStatus(data) {
+            const container = document.getElementById('certificateSection');
+            
+            if (data.eligible) {
+                // بررسی وجود گواهی قبلی
+                checkExistingCertificate();
+            } else {
+                container.innerHTML = `
+                    <div class="text-center">
+                        <i class="fas fa-lock fa-3x text-muted mb-3"></i>
+                        <h6>برای دریافت گواهی نیاز است:</h6>
+                        <ul class="list-unstyled">
+                            <li>✅ پیشرفت دوره: ${data.progress}% (حداقل 80%)</li>
+                            <li>${data.quizPassed ? '✅' : '❌'} قبولی در آزمون</li>
+                        </ul>
+                        <div class="progress mb-3">
+                            <div class="progress-bar" style="width: ${data.progress}%">${data.progress}%</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        async function checkExistingCertificate() {
+            try {
+                const response = await fetch(`/api/courses/${courseId}/certificate`, {
+                    headers: { 'Authorization': `Bearer ${userToken}` }
+                });
+                const data = await response.json();
+                
+                if (data.success && data.certificate) {
+                    // گواهی قبلاً صادر شده
+                    document.getElementById('certificateSection').innerHTML = `
+                        <div class="text-center">
+                            <i class="fas fa-certificate fa-3x text-success mb-3"></i>
+                            <h6 class="text-success">گواهی شما صادر شده است</h6>
+                            <p class="text-muted small">شماره: ${data.certificate.certificate_number}</p>
+                            <button class="btn btn-outline-success btn-sm" onclick="downloadCertificate(${data.certificate.id})">
+                                <i class="fas fa-download me-1"></i>
+                                دانلود گواهی
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    // صلاحیت دریافت گواهی
+                    document.getElementById('certificateSection').innerHTML = `
+                        <div class="text-center">
+                            <i class="fas fa-trophy fa-3x text-warning mb-3"></i>
+                            <h6 class="text-warning">تبریک! شما صلاحیت دریافت گواهی را دارید</h6>
+                            <button class="btn btn-success" onclick="issueCertificate()">
+                                <i class="fas fa-certificate me-1"></i>
+                                صدور گواهی
+                            </button>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error checking certificate:', error);
+            }
+        }
+
+        async function issueCertificate() {
+            try {
+                const response = await fetch(`/api/courses/${courseId}/certificate`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${userToken}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await response.json();
+                
+                if (data.success) {
+                    alert('گواهی شما با موفقیت صادر شد!');
+                    loadCertificateStatus();
+                } else {
+                    alert('خطا در صدور گواهی: ' + data.message);
+                }
+            } catch (error) {
+                console.error('Error issuing certificate:', error);
+                alert('خطا در ارتباط با سرور');
+            }
+        }
+
+        function downloadCertificate(certificateId) {
+            window.open(`/api/certificates/${certificateId}/download`, '_blank');
+        }
+
+        // بارگذاری جزئیات دوره هنگام لود صفحه
+        document.addEventListener('DOMContentLoaded', loadCourseDetail);
+    </script>
+</body>
+</html> 

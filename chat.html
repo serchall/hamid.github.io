@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>چت آنلاین</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .chat-container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+            padding: 0 0 16px 0;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+        .chat-header {
+            background: #1976d2;
+            color: #fff;
+            padding: 16px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background: #f7f7f7;
+        }
+        .chat-message {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-message .sender {
+            font-weight: bold;
+            color: #1976d2;
+            font-size: 0.97em;
+        }
+        .chat-message .text {
+            background: #e3f2fd;
+            border-radius: 8px;
+            padding: 8px 12px;
+            margin-top: 2px;
+            font-size: 1em;
+            color: #222;
+            max-width: 80%;
+        }
+        .chat-input {
+            display: flex;
+            border-top: 1px solid #eee;
+            padding: 10px;
+            background: #fafafa;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        .chat-input button {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 18px;
+            margin-right: 8px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        .chat-input button:hover { background: #125ea2; }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">چت آنلاین کاربران</div>
+        <div class="chat-messages" id="messages"></div>
+        <form class="chat-input" id="chatForm" autocomplete="off">
+            <input type="text" id="messageInput" placeholder="پیام خود را بنویسید..." required>
+            <button type="submit">ارسال</button>
+        </form>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // نام کاربری را از localStorage یا prompt دریافت می‌کنیم
+        let username = localStorage.getItem('chat_username');
+        if (!username) {
+            username = prompt('نام کاربری خود را وارد کنید:');
+            if (!username) username = 'کاربر ناشناس';
+            localStorage.setItem('chat_username', username);
+        }
+
+        const socket = io();
+        const messagesDiv = document.getElementById('messages');
+        const chatForm = document.getElementById('chatForm');
+        const messageInput = document.getElementById('messageInput');
+
+        function appendMessage(sender, text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'chat-message';
+            msgDiv.innerHTML = `<span class="sender">${sender}</span><span class="text">${text}</span>`;
+            messagesDiv.appendChild(msgDiv);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        socket.on('chat message', function(data) {
+            appendMessage(data.username, data.message);
+        });
+
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const msg = messageInput.value.trim();
+            if (msg) {
+                socket.emit('chat message', { username, message: msg });
+                messageInput.value = '';
+            }
+        });
+    </script>
+</body>
+</html> 

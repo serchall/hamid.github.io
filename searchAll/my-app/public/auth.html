@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود و ثبت‌نام</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .auth-container {
+            max-width: 400px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 24px 18px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+        }
+        .auth-container h2 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group { margin-bottom: 18px; }
+        label { display: block; margin-bottom: 6px; color: #333; }
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        .error { color: #e53935; font-size: 0.95em; margin-top: 4px; }
+        .success { color: #388e3c; font-size: 1em; margin-top: 8px; }
+        button[type="submit"] {
+            background: #1976d2;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 24px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+        button[type="submit"]:hover { background: #125ea2; }
+        .switch-link { color: #1976d2; cursor: pointer; text-decoration: underline; font-size: 0.97em; }
+        .switch-link:hover { color: #125ea2; }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <h2 id="form-title">ثبت‌نام</h2>
+        <form id="authForm" novalidate>
+            <div class="form-group" id="nameGroup" style="display: none;">
+                <label for="name">نام:</label>
+                <input type="text" id="name" name="name">
+                <div class="error" id="nameError"></div>
+            </div>
+            <div class="form-group">
+                <label for="email">ایمیل:</label>
+                <input type="email" id="email" name="email" required>
+                <div class="error" id="emailError"></div>
+            </div>
+            <div class="form-group">
+                <label for="password">رمز عبور:</label>
+                <input type="password" id="password" name="password" required>
+                <div class="error" id="passwordError"></div>
+            </div>
+            <button type="submit" id="submitBtn">ثبت‌نام</button>
+            <div class="success" id="successMsg"></div>
+        </form>
+        <p style="text-align:center; margin-top:16px;">
+            <span id="switchText">حساب کاربری دارید؟</span>
+            <span class="switch-link" id="switchForm">ورود</span>
+        </p>
+    </div>
+    <script>
+        let isLogin = false;
+        const form = document.getElementById('authForm');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const emailError = document.getElementById('emailError');
+        const passwordError = document.getElementById('passwordError');
+        const successMsg = document.getElementById('successMsg');
+        const formTitle = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submitBtn');
+        const switchForm = document.getElementById('switchForm');
+        const switchText = document.getElementById('switchText');
+
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function validatePassword(password) {
+            return password.length >= 6;
+        }
+
+        switchForm.addEventListener('click', () => {
+            isLogin = !isLogin;
+            const nameGroup = document.getElementById('nameGroup');
+            if (isLogin) {
+                formTitle.textContent = 'ورود';
+                submitBtn.textContent = 'ورود';
+                switchForm.textContent = 'ثبت‌نام';
+                switchText.textContent = 'حساب کاربری ندارید؟';
+                nameGroup.style.display = 'none';
+            } else {
+                formTitle.textContent = 'ثبت‌نام';
+                submitBtn.textContent = 'ثبت‌نام';
+                switchForm.textContent = 'ورود';
+                switchText.textContent = 'حساب کاربری دارید؟';
+                nameGroup.style.display = 'block';
+            }
+            successMsg.textContent = '';
+            emailError.textContent = '';
+            passwordError.textContent = '';
+            nameError.textContent = '';
+            form.reset();
+        });
+
+        // دریافت توکن CSRF از سرور
+        async function getCSRFToken() {
+            try {
+                const response = await fetch('/api/csrf-token', {
+                    method: 'GET',
+                    credentials: 'same-origin'
+                });
+                const data = await response.json();
+                return data.csrfToken;
+            } catch (err) {
+                console.error('خطا در دریافت توکن CSRF:', err);
+                return null;
+            }
+        }
+
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            emailError.textContent = '';
+            passwordError.textContent = '';
+            successMsg.textContent = '';
+
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            let valid = true;
+
+            if (!validateEmail(email)) {
+                emailError.textContent = 'ایمیل معتبر وارد کنید.';
+                valid = false;
+            }
+            if (!validatePassword(password)) {
+                passwordError.textContent = 'رمز عبور باید حداقل ۶ کاراکتر باشد.';
+                valid = false;
+            }
+            if (!valid) return;
+
+            // دریافت توکن CSRF
+            const csrfToken = await getCSRFToken();
+            if (!csrfToken) {
+                successMsg.textContent = 'خطا در امنیت فرم. لطفاً صفحه را رفرش کنید.';
+                successMsg.style.color = '#e53935';
+                return;
+            }
+
+            try {
+                const response = await fetch(isLogin ? '/api/login' : '/api/register', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'CSRF-Token': csrfToken
+                    },
+                    body: JSON.stringify({ 
+                        email, 
+                        password,
+                        name: isLogin ? undefined : document.getElementById('name')?.value || email.split('@')[0]
+                    })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    // ذخیره توکن و اطلاعات کاربر
+                    localStorage.setItem('token', result.token);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+                    localStorage.setItem('user_id', result.user.id);
+                    
+                    successMsg.textContent = result.message;
+                    successMsg.style.color = '#388e3c';
+                    form.reset();
+                    
+                    // انتقال به صفحه اصلی بعد از 2 ثانیه
+                    setTimeout(() => {
+                        window.location.href = '/';
+                    }, 2000);
+                } else {
+                    successMsg.textContent = result.message;
+                    successMsg.style.color = '#e53935';
+                }
+            } catch (err) {
+                successMsg.textContent = 'خطا در ارتباط با سرور';
+                successMsg.style.color = '#e53935';
+            }
+        });
+    </script>
+</body>
+</html> 

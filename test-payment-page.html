@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پرداخت تستی - سیستم داخلی</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        
+        .payment-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .payment-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .payment-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .payment-body {
+            padding: 30px;
+        }
+        
+        .product-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .product-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+        
+        .test-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .test-card-item {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .test-card-item:hover {
+            border-color: #667eea;
+            background: #e3f2fd;
+            transform: translateY(-2px);
+        }
+        
+        .test-card-item.selected {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .test-card-number {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .test-card-details {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .test-card-description {
+            color: #28a745;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .payment-form {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-control, .form-select {
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        
+        .payment-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 10px;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .payment-button:disabled {
+            background: #6c757d;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .payment-message {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .payment-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .payment-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: #667eea;
+        }
+        
+        .secure-badge {
+            background: #28a745;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .test-mode-badge {
+            background: #ffc107;
+            color: #212529;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 10px;
+        }
+        
+        .back-button {
+            background: none;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 10px;
+            padding: 10px 20px;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .card-preview {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 10px;
+            padding: 20px;
+            color: white;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .card-preview.show {
+            display: block;
+        }
+        
+        .card-preview-number {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .card-preview-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .payment-container {
+                margin: 0 15px;
+            }
+            
+            .payment-header {
+                padding: 20px;
+            }
+            
+            .payment-body {
+                padding: 20px;
+            }
+            
+            .test-cards-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="payment-container">
+            <div class="payment-card">
+                <div class="payment-header">
+                    <h2>
+                        <i class="fas fa-credit-card me-2"></i>پرداخت تستی
+                        <span class="test-mode-badge">
+                            <i class="fas fa-flask"></i>حالت تست
+                        </span>
+                    </h2>
+                    <p class="mb-0">اطلاعات کارت تستی خود را وارد کنید</p>
+                </div>
+                
+                <div class="payment-body">
+                    <!-- اطلاعات محصول -->
+                    <div class="product-info" id="productInfo">
+                        <div class="d-flex align-items-center">
+                            <img src="" alt="محصول" class="product-image me-3" id="productImage">
+                            <div class="flex-grow-1">
+                                <h5 class="mb-1" id="productName">در حال بارگذاری...</h5>
+                                <p class="text-muted mb-2" id="productDescription">توضیحات محصول</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="h4 text-primary mb-0" id="productPrice">$0.00</span>
+                                    <div>
+                                        <span class="secure-badge">
+                                            <i class="fas fa-shield-alt"></i>
+                                            پرداخت امن
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- پیش‌نمایش کارت -->
+                    <div class="card-preview" id="cardPreview">
+                        <div class="card-preview-number" id="previewCardNumber">**** **** **** ****</div>
+                        <div class="card-preview-details">
+                            <span id="previewCardholder">نام صاحب کارت</span>
+                            <span id="previewExpiry">MM/YYYY</span>
+                        </div>
+                    </div>
+                    
+                    <!-- کارت‌های تستی -->
+                    <div class="mb-4">
+                        <h6 class="mb-3">
+                            <i class="fas fa-credit-card me-2"></i>کارت‌های تستی
+                        </h6>
+                        <div id="testCardsContainer">
+                            <!-- کارت‌های تستی اینجا لود می‌شوند -->
+                        </div>
+                        <button class="btn btn-outline-info btn-sm mt-2" onclick="generateNewTestCard()">
+                            <i class="fas fa-plus me-2"></i>تولید کارت تستی جدید
+                        </button>
+                    </div>
+                    
+                    <!-- پیام‌های پرداخت -->
+                    <div class="payment-message success" id="payment-success"></div>
+                    <div class="payment-message error" id="payment-error"></div>
+                    
+                    <!-- فرم پرداخت -->
+                    <div id="payment-form-container">
+                        <!-- فرم پرداخت اینجا لود می‌شود -->
+                    </div>
+                    
+                    <div class="text-center">
+                        <button class="back-button" onclick="goBack()">
+                            <i class="fas fa-arrow-right me-2"></i>بازگشت
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="test-payment.js"></script>
+    <script>
+        let currentProductId = null;
+        
+        // راه‌اندازی صفحه
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // بررسی احراز هویت
+                if (!checkAuth()) return;
+                
+                // دریافت شناسه محصول از URL
+                const urlParams = new URLSearchParams(window.location.search);
+                currentProductId = urlParams.get('productId');
+                
+                if (!currentProductId) {
+                    throw new Error('شناسه محصول یافت نشد');
+                }
+                
+                // بارگذاری اطلاعات محصول
+                await loadProductInfo(currentProductId);
+                
+                // راه‌اندازی فرم پرداخت
+                await initializeTestPaymentForm('payment-form-container');
+                
+                // اضافه کردن event listeners برای پیش‌نمایش کارت
+                addCardPreviewListeners();
+                
+            } catch (error) {
+                console.error('خطا در راه‌اندازی صفحه:', error);
+                showError('خطا در راه‌اندازی صفحه: ' + error.message);
+            }
+        });
+        
+        // بارگذاری اطلاعات محصول
+        async function loadProductInfo(productId) {
+            try {
+                const response = await fetch(`/api/products/${productId}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const product = data.product;
+                    testPayment.setCurrentProduct(product);
+                    
+                    document.getElementById('productName').textContent = product.name;
+                    document.getElementById('productDescription').textContent = product.description;
+                    document.getElementById('productPrice').textContent = testPayment.formatPrice(product.price);
+                    
+                    if (product.imageUrl) {
+                        document.getElementById('productImage').src = product.imageUrl;
+                    }
+                    
+                } else {
+                    throw new Error(data.message);
+                }
+                
+            } catch (error) {
+                console.error('خطا در بارگذاری اطلاعات محصول:', error);
+                showError('خطا در بارگذاری اطلاعات محصول: ' + error.message);
+            }
+        }
+        
+        // اضافه کردن event listeners برای پیش‌نمایش کارت
+        function addCardPreviewListeners() {
+            // پیش‌نمایش شماره کارت
+            const cardNumberInput = document.getElementById('card-number');
+            if (cardNumberInput) {
+                cardNumberInput.addEventListener('input', updateCardPreview);
+            }
+            
+            // پیش‌نمایش نام صاحب کارت
+            const cardholderInput = document.getElementById('cardholder-name');
+            if (cardholderInput) {
+                cardholderInput.addEventListener('input', updateCardPreview);
+            }
+            
+            // پیش‌نمایش تاریخ انقضا
+            const expiryMonthSelect = document.getElementById('expiry-month');
+            const expiryYearSelect = document.getElementById('expiry-year');
+            if (expiryMonthSelect) {
+                expiryMonthSelect.addEventListener('change', updateCardPreview);
+            }
+            if (expiryYearSelect) {
+                expiryYearSelect.addEventListener('change', updateCardPreview);
+            }
+        }
+        
+        // به‌روزرسانی پیش‌نمایش کارت
+        function updateCardPreview() {
+            const cardNumber = document.getElementById('card-number')?.value || '';
+            const cardholder = document.getElementById('cardholder-name')?.value || '';
+            const expiryMonth = document.getElementById('expiry-month')?.value || '';
+            const expiryYear = document.getElementById('expiry-year')?.value || '';
+            
+            // به‌روزرسانی شماره کارت
+            const previewCardNumber = document.getElementById('previewCardNumber');
+            if (previewCardNumber) {
+                if (cardNumber) {
+                    previewCardNumber.textContent = cardNumber;
+                } else {
+                    previewCardNumber.textContent = '**** **** **** ****';
+                }
+            }
+            
+            // به‌روزرسانی نام صاحب کارت
+            const previewCardholder = document.getElementById('previewCardholder');
+            if (previewCardholder) {
+                previewCardholder.textContent = cardholder || 'نام صاحب کارت';
+            }
+            
+            // به‌روزرسانی تاریخ انقضا
+            const previewExpiry = document.getElementById('previewExpiry');
+            if (previewExpiry) {
+                if (expiryMonth && expiryYear) {
+                    previewExpiry.textContent = `${expiryMonth}/${expiryYear}`;
+                } else {
+                    previewExpiry.textContent = 'MM/YYYY';
+                }
+            }
+            
+            // نمایش/مخفی کردن پیش‌نمایش
+            const cardPreview = document.getElementById('cardPreview');
+            if (cardPreview) {
+                if (cardNumber || cardholder || expiryMonth || expiryYear) {
+                    cardPreview.classList.add('show');
+                } else {
+                    cardPreview.classList.remove('show');
+                }
+            }
+        }
+        
+        // نمایش پیام موفقیت
+        function showSuccess(message) {
+            const successElement = document.getElementById('payment-success');
+            if (successElement) {
+                successElement.textContent = message;
+                successElement.style.display = 'block';
+                successElement.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            // مخفی کردن پیام خطا
+            const errorElement = document.getElementById('payment-error');
+            if (errorElement) {
+                errorElement.style.display = 'none';
+            }
+        }
+        
+        // نمایش پیام خطا
+        function showError(message) {
+            const errorElement = document.getElementById('payment-error');
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                errorElement.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            // مخفی کردن پیام موفقیت
+            const successElement = document.getElementById('payment-success');
+            if (successElement) {
+                successElement.style.display = 'none';
+            }
+        }
+        
+        // بازگشت به صفحه قبل
+        function goBack() {
+            window.history.back();
+        }
+        
+        // تولید کارت تستی جدید
+        async function generateNewTestCard() {
+            await testPayment.generateNewTestCard();
+        }
+    </script>
+</body>
+</html> 

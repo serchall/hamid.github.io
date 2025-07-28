@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تنظیمات کاربری</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background: #f8f9fa; }
+        .settings-card { max-width: 500px; margin: 40px auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="settings-card card shadow">
+            <div class="card-header text-center">
+                <h3><i class="fas fa-cog me-2"></i>تنظیمات کاربری</h3>
+            </div>
+            <div class="card-body">
+                <form id="settingsForm">
+                    <div class="mb-3">
+                        <label class="form-label">زبان</label>
+                        <select class="form-select" id="langSelect">
+                            <option value="fa">فارسی</option>
+                            <option value="en">English</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">تم سایت</label>
+                        <select class="form-select" id="themeSelect">
+                            <option value="light">روشن</option>
+                            <option value="dark">تاریک</option>
+                        </select>
+                    </div>
+                    <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="notifSwitch">
+                        <label class="form-check-label" for="notifSwitch">فعال‌سازی اعلان‌ها</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">ذخیره تنظیمات</button>
+                </form>
+                <hr>
+                <button class="btn btn-outline-danger w-100 mt-2" id="deleteAccountBtn">حذف حساب کاربری</button>
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-bell me-2"></i>
+                            تنظیمات اعلان‌ها
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="enableNotifications" checked>
+                                    <label class="form-check-label" for="enableNotifications">
+                                        فعال کردن اعلان‌های زنده
+                                    </label>
+                                    <small class="form-text text-muted d-block">
+                                        دریافت اعلان‌های فوری برای رویدادهای مهم
+                                    </small>
+                                </div>
+                                
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="enableSound" checked>
+                                    <label class="form-check-label" for="enableSound">
+                                        صدای اعلان
+                                    </label>
+                                    <small class="form-text text-muted d-block">
+                                        پخش صدای کوتاه هنگام دریافت اعلان
+                                    </small>
+                                </div>
+                                
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="enableDesktopNotifications">
+                                    <label class="form-check-label" for="enableDesktopNotifications">
+                                        اعلان‌های مرورگر
+                                    </label>
+                                    <small class="form-text text-muted d-block">
+                                        نمایش اعلان‌ها در سیستم عامل (نیاز به مجوز)
+                                    </small>
+                                </div>
+                                
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="enableMobileNotifications">
+                                    <label class="form-check-label" for="enableMobileNotifications">
+                                        اعلان‌های موبایل
+                                    </label>
+                                    <small class="form-text text-muted d-block">
+                                        دریافت اعلان‌ها در دستگاه‌های موبایل
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="notificationDuration" class="form-label">
+                                        مدت نمایش اعلان (ثانیه)
+                                    </label>
+                                    <select class="form-select" id="notificationDuration">
+                                        <option value="3">3 ثانیه</option>
+                                        <option value="5" selected>5 ثانیه</option>
+                                        <option value="10">10 ثانیه</option>
+                                        <option value="0">بدون حذف خودکار</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="notificationPosition" class="form-label">
+                                        موقعیت نمایش
+                                    </label>
+                                    <select class="form-select" id="notificationPosition">
+                                        <option value="top-right" selected>بالا-راست</option>
+                                        <option value="top-left">بالا-چپ</option>
+                                        <option value="bottom-right">پایین-راست</option>
+                                        <option value="bottom-left">پایین-چپ</option>
+                                        <option value="center">وسط صفحه</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="notificationVolume" class="form-label">
+                                        بلندی صدا
+                                    </label>
+                                    <input type="range" class="form-range" id="notificationVolume" min="0" max="100" value="30">
+                                    <div class="d-flex justify-content-between">
+                                        <small>بی‌صدا</small>
+                                        <small id="volumeValue">30%</small>
+                                        <small>بیشترین</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label">انواع اعلان‌ها</label>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="notifyMessages" checked>
+                                        <label class="form-check-label" for="notifyMessages">
+                                            پیام‌های جدید
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="notifyFriendRequests" checked>
+                                        <label class="form-check-label" for="notifyFriendRequests">
+                                            درخواست‌های دوستی
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="notifyPurchases" checked>
+                                        <label class="form-check-label" for="notifyPurchases">
+                                            خریدهای موفق
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="notifySystem" checked>
+                                        <label class="form-check-label" for="notifySystem">
+                                            اعلان‌های سیستمی
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <button class="btn btn-primary" onclick="testNotification()">
+                                    <i class="fas fa-bell me-2"></i>
+                                    تست اعلان
+                                </button>
+                                <button class="btn btn-secondary ms-2" onclick="clearAllNotifications()">
+                                    <i class="fas fa-trash me-2"></i>
+                                    پاک کردن همه اعلان‌ها
+                                </button>
+                                <button class="btn btn-info ms-2" onclick="requestNotificationPermission()">
+                                    <i class="fas fa-shield-alt me-2"></i>
+                                    درخواست مجوز اعلان
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            document.body.innerHTML = '<div class="container mt-5"><div class="alert alert-danger">برای مشاهده تنظیمات ابتدا وارد شوید.</div></div>';
+            return;
+        }
+        // دریافت تنظیمات فعلی
+        const res = await fetch('/api/settings', { headers: { 'Authorization': `Bearer ${token}` } });
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById('langSelect').value = data.settings.lang || 'fa';
+            document.getElementById('themeSelect').value = data.settings.theme || 'light';
+            document.getElementById('notifSwitch').checked = data.settings.notifications !== false;
+        }
+        // ذخیره تنظیمات
+        document.getElementById('settingsForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const settings = {
+                lang: document.getElementById('langSelect').value,
+                theme: document.getElementById('themeSelect').value,
+                notifications: document.getElementById('notifSwitch').checked
+            };
+            const res = await fetch('/api/settings', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ settings })
+            });
+            const data = await res.json();
+            if (data.success) {
+                alert('تنظیمات با موفقیت ذخیره شد');
+            } else {
+                alert('خطا در ذخیره تنظیمات');
+            }
+        };
+        // حذف حساب کاربری (نمونه - فقط پیام می‌دهد)
+        document.getElementById('deleteAccountBtn').onclick = function() {
+            if (confirm('آیا مطمئن هستید؟ این عملیات غیرقابل بازگشت است.')) {
+                alert('در نسخه فعلی حذف حساب فقط نمایشی است. (در صورت نیاز، API حذف کاربر اضافه می‌شود)');
+            }
+        };
+    });
+    </script>
+</body>
+</html> 

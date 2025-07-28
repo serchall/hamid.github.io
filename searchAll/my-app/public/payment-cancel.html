@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لغو پرداخت - Stripe</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #dc3545 0%, #fd7e14 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .cancel-container {
+            max-width: 500px;
+            width: 100%;
+        }
+        
+        .cancel-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+            padding: 40px 30px;
+        }
+        
+        .cancel-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #dc3545, #fd7e14);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        .cancel-icon i {
+            font-size: 50px;
+            color: white;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .cancel-title {
+            color: #dc3545;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .cancel-message {
+            color: #6c757d;
+            font-size: 16px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .info-box {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .info-box h6 {
+            color: #856404;
+            margin-bottom: 10px;
+        }
+        
+        .info-box p {
+            color: #856404;
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #fd7e14);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+        }
+        
+        .btn-outline-primary {
+            border: 2px solid #007bff;
+            color: #007bff;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-primary:hover {
+            background: #007bff;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .btn-outline-secondary {
+            border: 2px solid #6c757d;
+            color: #6c757d;
+            border-radius: 10px;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-outline-secondary:hover {
+            background: #6c757d;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .help-links {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .help-links h6 {
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+        
+        .help-link {
+            display: inline-block;
+            color: #007bff;
+            text-decoration: none;
+            margin: 5px 10px;
+            padding: 8px 15px;
+            border: 1px solid #007bff;
+            border-radius: 20px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .help-link:hover {
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+        }
+        
+        @media (max-width: 768px) {
+            .cancel-card {
+                padding: 30px 20px;
+            }
+            
+            .cancel-title {
+                font-size: 24px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn-danger,
+            .btn-outline-primary,
+            .btn-outline-secondary {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cancel-container">
+        <div class="cancel-card">
+            <div class="cancel-icon">
+                <i class="fas fa-times"></i>
+            </div>
+            
+            <h1 class="cancel-title">پرداخت لغو شد</h1>
+            <p class="cancel-message">
+                تراکنش شما لغو شده است. هیچ مبلغی از حساب شما کسر نشده است.
+            </p>
+            
+            <!-- اطلاعات مفید -->
+            <div class="info-box">
+                <h6><i class="fas fa-info-circle me-2"></i>اطلاعات مهم</h6>
+                <p>
+                    اگر در حین پرداخت مشکلی پیش آمده، می‌توانید دوباره تلاش کنید. 
+                    هیچ مبلغی از حساب شما کسر نشده و تراکنش ناتمام مانده است.
+                </p>
+            </div>
+            
+            <!-- دکمه‌های عملیات -->
+            <div class="action-buttons">
+                <button class="btn btn-danger" onclick="retryPayment()">
+                    <i class="fas fa-redo me-2"></i>تلاش مجدد
+                </button>
+                <button class="btn btn-outline-primary" onclick="goToCourses()">
+                    <i class="fas fa-graduation-cap me-2"></i>مشاهده دوره‌ها
+                </button>
+                <button class="btn btn-outline-secondary" onclick="goHome()">
+                    <i class="fas fa-home me-2"></i>صفحه اصلی
+                </button>
+            </div>
+            
+            <!-- لینک‌های کمک -->
+            <div class="help-links">
+                <h6>نیاز به کمک دارید؟</h6>
+                <a href="#" class="help-link" onclick="showHelp()">
+                    <i class="fas fa-question-circle me-1"></i>راهنمای پرداخت
+                </a>
+                <a href="#" class="help-link" onclick="contactSupport()">
+                    <i class="fas fa-headset me-1"></i>پشتیبانی
+                </a>
+                <a href="#" class="help-link" onclick="showFAQ()">
+                    <i class="fas fa-book me-1"></i>سوالات متداول
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // راه‌اندازی صفحه
+        document.addEventListener('DOMContentLoaded', () => {
+            // بررسی احراز هویت
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+                window.location.href = '/login.html';
+            }
+        });
+        
+        // تلاش مجدد پرداخت
+        function retryPayment() {
+            // بازگشت به صفحه قبل یا صفحه محصولات
+            if (document.referrer) {
+                window.history.back();
+            } else {
+                window.location.href = '/courses.html';
+            }
+        }
+        
+        // هدایت به دوره‌ها
+        function goToCourses() {
+            window.location.href = '/courses.html';
+        }
+        
+        // هدایت به صفحه اصلی
+        function goHome() {
+            window.location.href = '/';
+        }
+        
+        // نمایش راهنمای پرداخت
+        function showHelp() {
+            alert('راهنمای پرداخت:\n\n1. اطمینان حاصل کنید که کارت بانکی شما فعال است\n2. اطلاعات کارت را به درستی وارد کنید\n3. رمز دوم کارت را آماده داشته باشید\n4. در صورت مشکل با بانک خود تماس بگیرید');
+        }
+        
+        // تماس با پشتیبانی
+        function contactSupport() {
+            alert('برای تماس با پشتیبانی:\n\n📧 ایمیل: support@example.com\n📞 تلفن: 021-12345678\n💬 چت آنلاین: در دسترس در ساعات کاری');
+        }
+        
+        // نمایش سوالات متداول
+        function showFAQ() {
+            alert('سوالات متداول:\n\n❓ آیا پرداخت امن است؟\n✅ بله، تمام پرداخت‌ها از طریق Stripe انجام می‌شود\n\n❓ آیا می‌توانم بازپرداخت کنم؟\n✅ بله، تا 30 روز امکان بازپرداخت وجود دارد\n\n❓ چه کارت‌هایی پشتیبانی می‌شود؟\n✅ تمام کارت‌های Visa، Mastercard، American Express');
+        }
+        
+        // ذخیره اطلاعات لغو در localStorage
+        const cancelInfo = {
+            timestamp: new Date().toISOString(),
+            reason: 'user_cancelled',
+            page: window.location.href
+        };
+        
+        localStorage.setItem('lastPaymentCancel', JSON.stringify(cancelInfo));
+    </script>
+</body>
+</html> 

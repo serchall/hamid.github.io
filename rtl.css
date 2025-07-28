@@ -1,0 +1,345 @@
+/* استایل‌های RTL برای زبان فارسی و عربی */
+
+/* جهت کلی */
+.rtl {
+    direction: rtl;
+    text-align: right;
+}
+
+/* فونت‌های عربی */
+[lang="ar"] {
+    font-family: 'Arial', 'Tahoma', 'Segoe UI', sans-serif;
+}
+
+[lang="ar"] .rtl {
+    font-family: 'Arial', 'Tahoma', 'Segoe UI', sans-serif;
+}
+
+/* منوها */
+.rtl .navbar-nav {
+    padding-right: 0;
+}
+
+.rtl .dropdown-menu {
+    right: 0;
+    left: auto;
+    text-align: right;
+}
+
+.rtl .dropdown-item {
+    text-align: right;
+}
+
+/* فاصله‌ها */
+.rtl .me-1 {
+    margin-left: 0.25rem !important;
+    margin-right: 0 !important;
+}
+
+.rtl .me-2 {
+    margin-left: 0.5rem !important;
+    margin-right: 0 !important;
+}
+
+.rtl .me-3 {
+    margin-left: 1rem !important;
+    margin-right: 0 !important;
+}
+
+.rtl .ms-1 {
+    margin-right: 0.25rem !important;
+    margin-left: 0 !important;
+}
+
+.rtl .ms-2 {
+    margin-right: 0.5rem !important;
+    margin-left: 0 !important;
+}
+
+.rtl .ms-3 {
+    margin-right: 1rem !important;
+    margin-left: 0 !important;
+}
+
+/* padding ها */
+.rtl .pe-1 {
+    padding-left: 0.25rem !important;
+    padding-right: 0 !important;
+}
+
+.rtl .pe-2 {
+    padding-left: 0.5rem !important;
+    padding-right: 0 !important;
+}
+
+.rtl .ps-1 {
+    padding-right: 0.25rem !important;
+    padding-left: 0 !important;
+}
+
+.rtl .ps-2 {
+    padding-right: 0.5rem !important;
+    padding-left: 0 !important;
+}
+
+/* متن‌ها */
+.rtl .text-start {
+    text-align: right !important;
+}
+
+.rtl .text-end {
+    text-align: left !important;
+}
+
+/* فرم‌ها */
+.rtl .form-label {
+    text-align: right;
+}
+
+.rtl .form-check {
+    padding-right: 1.5em;
+    padding-left: 0;
+}
+
+.rtl .form-check-input {
+    margin-right: -1.5em;
+    margin-left: 0;
+}
+
+/* دکمه‌ها */
+.rtl .btn-group > .btn:not(:last-child):not(.dropdown-toggle) {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}
+
+.rtl .btn-group > .btn:not(:first-child) {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+}
+
+/* کارت‌ها */
+.rtl .card-header {
+    text-align: right;
+}
+
+.rtl .card-footer {
+    text-align: right;
+}
+
+/* لیست‌ها */
+.rtl .list-group-item {
+    text-align: right;
+}
+
+/* جدول‌ها */
+.rtl .table th,
+.rtl .table td {
+    text-align: right;
+}
+
+/* مودال‌ها */
+.rtl .modal-header .btn-close {
+    margin: -0.5rem auto -0.5rem -0.5rem;
+}
+
+.rtl .modal-footer {
+    justify-content: flex-start;
+}
+
+/* ناوبری */
+.rtl .breadcrumb-item + .breadcrumb-item::before {
+    content: var(--bs-breadcrumb-divider, "/");
+    float: right;
+    padding-left: 0.5rem;
+    padding-right: 0;
+}
+
+.rtl .breadcrumb-item + .breadcrumb-item {
+    padding-right: 0.5rem;
+    padding-left: 0;
+}
+
+/* پاگینیشن */
+.rtl .pagination .page-link {
+    margin-right: -1px;
+    margin-left: 0;
+}
+
+.rtl .pagination .page-item:first-child .page-link {
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.rtl .pagination .page-item:last-child .page-link {
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/* آیکون‌ها */
+.rtl .fas.fa-chevron-left::before {
+    content: "\f054"; /* chevron-right */
+}
+
+.rtl .fas.fa-chevron-right::before {
+    content: "\f053"; /* chevron-left */
+}
+
+.rtl .fas.fa-arrow-left::before {
+    content: "\f061"; /* arrow-right */
+}
+
+.rtl .fas.fa-arrow-right::before {
+    content: "\f060"; /* arrow-left */
+}
+
+/* چت و پیام‌رسان */
+.rtl .chat-message {
+    text-align: right;
+}
+
+.rtl .chat-message.sent {
+    margin-right: 0;
+    margin-left: auto;
+}
+
+.rtl .chat-message.received {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+/* نوتیفیکیشن‌ها */
+.rtl .toast {
+    text-align: right;
+}
+
+.rtl .alert {
+    text-align: right;
+}
+
+/* منوی همبرگری */
+.rtl .navbar-toggler {
+    padding: 0.25rem 0.75rem;
+    font-size: 1.25rem;
+    line-height: 1;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 0.375rem;
+    transition: box-shadow 0.15s ease-in-out;
+}
+
+/* فوتر */
+.rtl .footer {
+    text-align: right;
+}
+
+/* انتخاب زبان */
+.language-selector {
+    position: relative;
+}
+
+.language-selector .dropdown-menu {
+    min-width: 120px;
+}
+
+.language-selector .dropdown-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+}
+
+.language-selector .dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* فلگ‌ها */
+.flag-icon {
+    width: 16px;
+    height: 12px;
+    margin-left: 0.5rem;
+    margin-right: 0;
+    border-radius: 2px;
+}
+
+.rtl .flag-icon {
+    margin-right: 0.5rem;
+    margin-left: 0;
+}
+
+/* انیمیشن‌ها */
+.rtl .slide-in-right {
+    animation: slideInRight 0.3s ease-out;
+}
+
+.rtl .slide-in-left {
+    animation: slideInLeft 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* تنظیمات خاص برای کامپوننت‌های مختلف */
+.rtl .video-player {
+    direction: ltr; /* ویدیو پلیر همیشه LTR */
+}
+
+.rtl .code-block {
+    direction: ltr; /* کدها همیشه LTR */
+    text-align: left;
+}
+
+.rtl .email-address {
+    direction: ltr; /* ایمیل‌ها همیشه LTR */
+}
+
+.rtl .url {
+    direction: ltr; /* URL ها همیشه LTR */
+}
+
+/* تنظیمات برای موبایل */
+@media (max-width: 768px) {
+    .rtl .navbar-nav {
+        text-align: right;
+    }
+    
+    .rtl .dropdown-menu {
+        position: static !important;
+        float: none;
+        width: auto;
+        margin-top: 0;
+        background-color: transparent;
+        border: 0;
+        box-shadow: none;
+    }
+    
+    .rtl .language-selector {
+        margin-right: 0;
+        margin-left: 1rem;
+    }
+} 

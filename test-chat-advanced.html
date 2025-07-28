@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تست پیشرفته ویجت چت</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .test-container {
+            padding: 50px 20px;
+            color: white;
+        }
+        
+        .test-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .test-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+        
+        .test-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .feature-list {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .feature-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-list i {
+            margin-left: 10px;
+            color: #4CAF50;
+        }
+        
+        .auth-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .auth-form input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 5px;
+        }
+        
+        .auth-form input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+        
+        .status-online { background: #4CAF50; }
+        .status-offline { background: #f44336; }
+        .status-loading { background: #ff9800; animation: pulse 1s infinite; }
+    </style>
+</head>
+<body>
+    <div class="container test-container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="text-center mb-5">
+                    <h1 class="display-4 mb-3">🧪 تست پیشرفته ویجت چت</h1>
+                    <p class="lead">ویجت چت با قابلیت احراز هویت و ذخیره در دیتابیس</p>
+                </div>
+                
+                <!-- Authentication Section -->
+                <div class="test-card">
+                    <h3><i class="fas fa-user-shield me-2"></i>احراز هویت</h3>
+                    <div class="auth-section">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>وضعیت فعلی:</h5>
+                                <p>
+                                    <span id="authStatus">در حال بررسی...</span>
+                                    <span class="status-indicator status-loading" id="authIndicator"></span>
+                                </p>
+                                <p id="userInfo" style="display: none;">
+                                    نام: <span id="userName"></span><br>
+                                    ایمیل: <span id="userEmail"></span>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="auth-form">
+                                    <input type="email" id="loginEmail" placeholder="ایمیل" class="form-control">
+                                    <input type="password" id="loginPassword" placeholder="رمز عبور" class="form-control">
+                                    <button class="test-button" onclick="testLogin()">
+                                        <i class="fas fa-sign-in-alt me-1"></i>ورود
+                                    </button>
+                                    <button class="test-button" onclick="testLogout()">
+                                        <i class="fas fa-sign-out-alt me-1"></i>خروج
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Chat Controls -->
+                <div class="test-card">
+                    <h3><i class="fas fa-cogs me-2"></i>کنترل‌های چت</h3>
+                    <div class="text-center">
+                        <button class="test-button" onclick="window.chatWidget.open()">
+                            <i class="fas fa-comments me-1"></i>باز کردن چت
+                        </button>
+                        <button class="test-button" onclick="window.chatWidget.close()">
+                            <i class="fas fa-times me-1"></i>بستن چت
+                        </button>
+                        <button class="test-button" onclick="testAutoResponse()">
+                            <i class="fas fa-robot me-1"></i>تست پاسخ خودکار
+                        </button>
+                        <button class="test-button" onclick="testDatabaseMessages()">
+                            <i class="fas fa-database me-1"></i>تست پیام‌های دیتابیس
+                        </button>
+                        <button class="test-button" onclick="testMultipleUsers()">
+                            <i class="fas fa-users me-1"></i>تست چند کاربر
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- New Features -->
+                <div class="test-card">
+                    <h3><i class="fas fa-star me-2"></i>ویژگی‌های جدید</h3>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check-circle"></i>احراز هویت خودکار بدون ری‌لود</li>
+                        <li><i class="fas fa-check-circle"></i>ذخیره و بازیابی پیام‌ها از دیتابیس</li>
+                        <li><i class="fas fa-check-circle"></i>اتصال خاص برای هر کاربر</li>
+                        <li><i class="fas fa-check-circle"></i>مدیریت جلسه کاربر</li>
+                        <li><i class="fas fa-check-circle"></i>پاسخ‌های خودکار هوشمند</li>
+                        <li><i class="fas fa-check-circle"></i>نمایش وضعیت اتصال real-time</li>
+                        <li><i class="fas fa-check-circle"></i>تاریخچه چت شخصی</li>
+                        <li><i class="fas fa-check-circle"></i>امنیت بالا با JWT</li>
+                    </ul>
+                </div>
+                
+                <!-- Technical Details -->
+                <div class="test-card">
+                    <h3><i class="fas fa-code me-2"></i>جزئیات فنی</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>Frontend:</h5>
+                            <ul class="feature-list">
+                                <li><i class="fas fa-code"></i>Socket.IO Client</li>
+                                <li><i class="fas fa-code"></i>AuthManager Class</li>
+                                <li><i class="fas fa-code"></i>ChatWidget Class</li>
+                                <li><i class="fas fa-code"></i>Event-driven Architecture</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h5>Backend:</h5>
+                            <ul class="feature-list">
+                                <li><i class="fas fa-code"></i>Socket.IO Server</li>
+                                <li><i class="fas fa-code"></i>MongoDB Integration</li>
+                                <li><i class="fas fa-code"></i>JWT Authentication</li>
+                                <li><i class="fas fa-code"></i>Auto-response System</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- API Testing -->
+                <div class="test-card">
+                    <h3><i class="fas fa-api me-2"></i>تست API</h3>
+                    <div class="text-center">
+                        <button class="test-button" onclick="testGetMessages()">
+                            <i class="fas fa-download me-1"></i>دریافت پیام‌ها
+                        </button>
+                        <button class="test-button" onclick="testSendMessage()">
+                            <i class="fas fa-paper-plane me-1"></i>ارسال پیام
+                        </button>
+                        <button class="test-button" onclick="testValidateToken()">
+                            <i class="fas fa-key me-1"></i>تست توکن
+                        </button>
+                    </div>
+                    <div id="apiResults" class="mt-3" style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; display: none;">
+                        <h6>نتایج API:</h6>
+                        <pre id="apiOutput" style="color: #fff; font-size: 12px;"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Widget -->
+    <link rel="stylesheet" href="chat-widget.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="auth-manager.js"></script>
+    <script src="chat-widget.js"></script>
+    
+    <script>
+        // Initialize chat widget with advanced options
+        window.chatWidget = new ChatWidget({
+            autoOpen: false,
+            showWelcome: true,
+            maxMessages: 100
+        });
+
+        // Update auth status
+        function updateAuthStatus() {
+            const authManager = window.authManager;
+            const statusElement = document.getElementById('authStatus');
+            const indicatorElement = document.getElementById('authIndicator');
+            const userInfoElement = document.getElementById('userInfo');
+            const userNameElement = document.getElementById('userName');
+            const userEmailElement = document.getElementById('userEmail');
+
+            if (authManager.isAuthenticated()) {
+                const user = authManager.getUser();
+                statusElement.textContent = 'احراز هویت شده';
+                indicatorElement.className = 'status-indicator status-online';
+                userInfoElement.style.display = 'block';
+                userNameElement.textContent = user.name;
+                userEmailElement.textContent = user.email;
+            } else {
+                statusElement.textContent = 'احراز هویت نشده';
+                indicatorElement.className = 'status-indicator status-offline';
+                userInfoElement.style.display = 'none';
+            }
+        }
+
+        // Test functions
+        function testLogin() {
+            const email = document.getElementById('loginEmail').value || 'test@example.com';
+            const password = document.getElementById('loginPassword').value || 'password123';
+            
+            window.authManager.loginWithCredentials(email, password).then(result => {
+                if (result.success) {
+                    updateAuthStatus();
+                    showApiResult('ورود موفق', result);
+                } else {
+                    showApiResult('خطا در ورود', result);
+                }
+            });
+        }
+
+        function testLogout() {
+            window.authManager.logout();
+            updateAuthStatus();
+            showApiResult('خروج موفق', { message: 'کاربر با موفقیت خارج شد' });
+        }
+
+        function testAutoResponse() {
+            const testMessages = [
+                'سلام',
+                'قیمت',
+                'ساعت کاری',
+                'ارسال',
+                'بازگشت',
+                'پشتیبانی',
+                'کمک',
+                'خداحافظ'
+            ];
+            
+            const randomMessage = testMessages[Math.floor(Math.random() * testMessages.length)];
+            window.chatWidget.send(randomMessage);
+            showApiResult('پیام ارسال شد', { message: randomMessage });
+        }
+
+        function testDatabaseMessages() {
+            if (window.chatWidget) {
+                window.chatWidget.loadMessagesFromDatabase();
+                showApiResult('درخواست پیام‌ها', { message: 'درخواست بارگذاری پیام‌ها از دیتابیس ارسال شد' });
+            }
+        }
+
+        function testMultipleUsers() {
+            // Simulate multiple users by opening multiple tabs
+            const newTab = window.open(window.location.href, '_blank');
+            showApiResult('تست چند کاربر', { message: 'تب جدید باز شد. می‌توانید چت را در هر دو تب تست کنید' });
+        }
+
+        function testGetMessages() {
+            const token = window.authManager.getToken();
+            if (!token) {
+                showApiResult('خطا', { message: 'ابتدا وارد شوید' });
+                return;
+            }
+
+            fetch('/api/chat/messages', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                showApiResult('دریافت پیام‌ها', data);
+            })
+            .catch(error => {
+                showApiResult('خطا', { message: error.message });
+            });
+        }
+
+        function testSendMessage() {
+            const token = window.authManager.getToken();
+            if (!token) {
+                showApiResult('خطا', { message: 'ابتدا وارد شوید' });
+                return;
+            }
+
+            fetch('/api/chat/messages', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    text: 'پیام تست از API'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                showApiResult('ارسال پیام', data);
+            })
+            .catch(error => {
+                showApiResult('خطا', { message: error.message });
+            });
+        }
+
+        function testValidateToken() {
+            window.authManager.validateToken().then(isValid => {
+                showApiResult('تست توکن', { 
+                    valid: isValid,
+                    message: isValid ? 'توکن معتبر است' : 'توکن نامعتبر است'
+                });
+            });
+        }
+
+        function showApiResult(title, data) {
+            const resultsElement = document.getElementById('apiResults');
+            const outputElement = document.getElementById('apiOutput');
+            
+            outputElement.textContent = `${title}:\n${JSON.stringify(data, null, 2)}`;
+            resultsElement.style.display = 'block';
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                resultsElement.style.display = 'none';
+            }, 5000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAuthStatus();
+            
+            // Listen for auth changes
+            window.addEventListener('authStateChanged', () => {
+                updateAuthStatus();
+            });
+        });
+    </script>
+</body>
+</html> 

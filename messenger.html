@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پیام‌رسان آنلاین</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 100vh;
+            overflow: hidden;
+        }
+        .messenger-container {
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            margin: 10px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar {
+            width: 300px;
+            background: #f8f9fa;
+            border-left: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+        }
+        .conversation-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        .conversation-item {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .conversation-item:hover {
+            background: #e9ecef;
+        }
+        .conversation-item.active {
+            background: #007bff;
+            color: white;
+        }
+        .conversation-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #007bff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .conversation-info {
+            flex: 1;
+        }
+        .conversation-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .conversation-last-message {
+            font-size: 0.9em;
+            color: #6c757d;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .unread-badge {
+            background: #dc3545;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            margin-right: 10px;
+        }
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-header {
+            padding: 15px 20px;
+            background: #fff;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-end;
+        }
+        .message.sent {
+            justify-content: flex-end;
+        }
+        .message.received {
+            justify-content: flex-start;
+        }
+        .message-content {
+            max-width: 70%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            position: relative;
+        }
+        .message.sent .message-content {
+            background: #007bff;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        .message.received .message-content {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-bottom-left-radius: 4px;
+        }
+        .message-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.9em;
+            margin: 0 8px;
+        }
+        .message-info {
+            font-size: 0.8em;
+            margin-top: 5px;
+            opacity: 0.7;
+        }
+        .chat-input {
+            padding: 20px;
+            background: #fff;
+            border-top: 1px solid #dee2e6;
+        }
+        .input-group {
+            position: relative;
+        }
+        .form-control {
+            border-radius: 25px;
+            border: 2px solid #e9ecef;
+            padding: 12px 50px 12px 20px;
+            resize: none;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        }
+        .send-btn {
+            position: absolute;
+            left: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #007bff;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .send-btn:hover {
+            background: #0056b3;
+        }
+        .send-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .typing-indicator {
+            padding: 10px 20px;
+            font-style: italic;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        .new-chat-btn {
+            background: #28a745;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            margin: 15px;
+            transition: all 0.3s ease;
+        }
+        .new-chat-btn:hover {
+            background: #1e7e34;
+        }
+        .modal-content {
+            border-radius: 15px;
+        }
+        .participant-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        .participant-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #007bff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .file-upload {
+            position: absolute;
+            right: 50px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #6c757d;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .file-upload:hover {
+            background: #545b62;
+        }
+        .message-file {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+        .message-image {
+            max-width: 200px;
+            border-radius: 10px;
+            margin-top: 5px;
+        }
+        .online-indicator {
+            width: 12px;
+            height: 12px;
+            background: #28a745;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            border: 2px solid white;
+        }
+    </style>
+</head>
+<body>
+    <div class="messenger-container">
+        <div class="d-flex h-100">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="p-3 border-bottom">
+                    <h5 class="mb-0"><i class="fas fa-comments text-primary me-2"></i>پیام‌رسان</h5>
+                </div>
+                
+                <button class="new-chat-btn" onclick="showNewChatModal()">
+                    <i class="fas fa-plus me-2"></i>چت جدید
+                </button>
+                
+                <div class="conversation-list" id="conversationList">
+                    <!-- چت‌ها اینجا لود می‌شوند -->
+                </div>
+            </div>
+            
+            <!-- Chat Area -->
+            <div class="chat-area">
+                <div class="chat-header" id="chatHeader" style="display:none;">
+                    <div class="d-flex align-items-center">
+                        <div class="conversation-avatar" id="currentChatAvatar">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="ms-3">
+                            <h6 class="mb-0" id="currentChatName">انتخاب چت</h6>
+                            <small class="text-muted" id="currentChatStatus">آنلاین</small>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn btn-outline-primary btn-sm me-2" onclick="showParticipantsModal()">
+                            <i class="fas fa-users"></i>
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" onclick="leaveConversation()">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="text-center text-muted mt-5">
+                        <i class="fas fa-comments" style="font-size: 3rem;"></i>
+                        <p class="mt-3">برای شروع چت، یک گفتگو را انتخاب کنید</p>
+                    </div>
+                </div>
+                
+                <div class="typing-indicator" id="typingIndicator" style="display:none;">
+                    <i class="fas fa-circle fa-pulse me-2"></i>
+                    <span id="typingText">در حال تایپ...</span>
+                </div>
+                
+                <div class="chat-input" id="chatInput" style="display:none;">
+                    <div class="input-group">
+                        <textarea class="form-control" id="messageInput" placeholder="پیام خود را بنویسید..." rows="1"></textarea>
+                        <input type="file" id="fileInput" style="display:none;" accept="image/*,.pdf,.doc,.docx">
+                        <button class="file-upload" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-paperclip"></i>
+                        </button>
+                        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal برای چت جدید -->
+    <div class="modal fade" id="newChatModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">چت جدید</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">نوع چت</label>
+                        <select class="form-select" id="chatType">
+                            <option value="individual">فردی</option>
+                            <option value="group">گروهی</option>
+                        </select>
+                    </div>
+                    <div class="mb-3" id="chatNameGroup" style="display:none;">
+                        <label class="form-label">نام گروه</label>
+                        <input type="text" class="form-control" id="chatName" placeholder="نام گروه را وارد کنید">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">انتخاب کاربران</label>
+                        <div id="userList" style="max-height: 200px; overflow-y: auto;">
+                            <!-- لیست کاربران اینجا لود می‌شود -->
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">انصراف</button>
+                    <button type="button" class="btn btn-primary" onclick="createNewChat()">ایجاد چت</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal برای شرکت‌کنندگان -->
+    <div class="modal fade" id="participantsModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">شرکت‌کنندگان</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="participantsList">
+                        <!-- لیست شرکت‌کنندگان اینجا لود می‌شود -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        let socket;
+        let currentUser;
+        let currentConversation = null;
+        let conversations = [];
+        let users = [];
+        let typingTimeout;
+
+        // بررسی احراز هویت
+        const token = localStorage.getItem('authToken');
+        if (!token) {
+            window.location.href = '/login.html';
+        }
+
+        // راه‌اندازی WebSocket
+        function initializeSocket() {
+            socket = io();
+            
+            socket.on('connect', () => {
+                console.log('🔌 Connected to server');
+                socket.emit('authenticate', { token });
+            });
+            
+            socket.on('conversations', (data) => {
+                conversations = data;
+                renderConversations();
+            });
+            
+            socket.on('new_message', (message) => {
+                if (currentConversation && message.conversationId === currentConversation.id) {
+                    addMessageToChat(message);
+                }
+                updateConversationList();
+            });
+            
+            socket.on('user_typing', (data) => {
+                if (currentConversation && data.conversationId === currentConversation.id) {
+                    showTypingIndicator(data.userId);
+                }
+            });
+            
+            socket.on('user_stop_typing', (data) => {
+                if (currentConversation && data.conversationId === currentConversation.id) {
+                    hideTypingIndicator();
+                }
+            });
+            
+            socket.on('messages_read', (data) => {
+                if (currentConversation && data.conversationId === currentConversation.id) {
+                    markMessagesAsRead();
+                }
+            });
+            
+            socket.on('error', (error) => {
+                console.error('Socket error:', error);
+                alert('خطا در اتصال به سرور');
+            });
+        }
+
+        // رندر کردن لیست چت‌ها
+        function renderConversations() {
+            const container = document.getElementById('conversationList');
+            container.innerHTML = '';
+            
+            conversations.forEach(conversation => {
+                const item = document.createElement('div');
+                item.className = 'conversation-item d-flex align-items-center';
+                item.onclick = () => selectConversation(conversation);
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'conversation-avatar';
+                avatar.innerHTML = conversation.type === 'group' ? 
+                    '<i class="fas fa-users"></i>' : 
+                    conversation.name ? conversation.name.charAt(0).toUpperCase() : 'U';
+                
+                const info = document.createElement('div');
+                info.className = 'conversation-info';
+                info.innerHTML = `
+                    <div class="conversation-name">${conversation.name || 'چت بدون نام'}</div>
+                    <div class="conversation-last-message">${conversation.lastMessage || 'هیچ پیامی وجود ندارد'}</div>
+                `;
+                
+                const badge = conversation.unreadCount > 0 ? 
+                    `<div class="unread-badge">${conversation.unreadCount}</div>` : '';
+                
+                item.innerHTML = `
+                    ${avatar.outerHTML}
+                    ${info.outerHTML}
+                    ${badge}
+                `;
+                
+                container.appendChild(item);
+            });
+        }
+
+        // انتخاب چت
+        async function selectConversation(conversation) {
+            currentConversation = conversation;
+            
+            // به‌روزرسانی UI
+            document.getElementById('chatHeader').style.display = 'flex';
+            document.getElementById('chatInput').style.display = 'block';
+            document.getElementById('currentChatName').textContent = conversation.name || 'چت بدون نام';
+            document.getElementById('currentChatAvatar').innerHTML = conversation.type === 'group' ? 
+                '<i class="fas fa-users"></i>' : 
+                conversation.name ? conversation.name.charAt(0).toUpperCase() : 'U';
+            
+            // پیوستن به چت
+            socket.emit('join_conversation', conversation.id);
+            
+            // بارگذاری پیام‌ها
+            await loadMessages(conversation.id);
+            
+            // علامت‌گذاری به عنوان خوانده شده
+            socket.emit('mark_read', { conversationId: conversation.id });
+        }
+
+        // بارگذاری پیام‌ها
+        async function loadMessages(conversationId) {
+            try {
+                const response = await fetch(`/api/conversations/${conversationId}/messages`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    renderMessages(data.messages);
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+            }
+        }
+
+        // رندر کردن پیام‌ها
+        function renderMessages(messages) {
+            const container = document.getElementById('chatMessages');
+            container.innerHTML = '';
+            
+            messages.reverse().forEach(message => {
+                addMessageToChat(message);
+            });
+            
+            scrollToBottom();
+        }
+
+        // اضافه کردن پیام به چت
+        function addMessageToChat(message) {
+            const container = document.getElementById('chatMessages');
+            const isSent = message.senderId === currentUser?.id;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+            
+            let content = `<div class="message-content">${message.content}</div>`;
+            
+            if (message.messageType === 'image') {
+                content += `<img src="${message.fileUrl}" class="message-image" alt="تصویر">`;
+            } else if (message.messageType === 'file') {
+                content += `<div class="message-file">
+                    <i class="fas fa-file me-2"></i>
+                    <a href="${message.fileUrl}" target="_blank">دانلود فایل</a>
+                </div>`;
+            }
+            
+            if (!isSent) {
+                content = `
+                    <div class="message-avatar">${message.senderName ? message.senderName.charAt(0).toUpperCase() : 'U'}</div>
+                    ${content}
+                `;
+            }
+            
+            content += `<div class="message-info">${new Date(message.createdAt).toLocaleTimeString('fa-IR')}</div>`;
+            
+            messageDiv.innerHTML = content;
+            container.appendChild(messageDiv);
+            
+            scrollToBottom();
+        }
+
+        // ارسال پیام
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+            
+            if (!content || !currentConversation) return;
+            
+            socket.emit('send_message', {
+                conversationId: currentConversation.id,
+                content: content,
+                messageType: 'text'
+            });
+            
+            input.value = '';
+            input.style.height = 'auto';
+        }
+
+        // ارسال فایل
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file || !currentConversation) return;
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('conversationId', currentConversation.id);
+            
+            fetch('/api/conversations/upload', {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    socket.emit('send_message', {
+                        conversationId: currentConversation.id,
+                        content: file.name,
+                        messageType: file.type.startsWith('image/') ? 'image' : 'file',
+                        fileUrl: data.fileUrl
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error uploading file:', error);
+                alert('خطا در آپلود فایل');
+            });
+            
+            e.target.value = '';
+        });
+
+        // تایپ کردن
+        document.getElementById('messageInput').addEventListener('input', function() {
+            if (!currentConversation) return;
+            
+            socket.emit('typing', { conversationId: currentConversation.id });
+            
+            clearTimeout(typingTimeout);
+            typingTimeout = setTimeout(() => {
+                socket.emit('stop_typing', { conversationId: currentConversation.id });
+            }, 1000);
+            
+            // تنظیم ارتفاع textarea
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+
+        // Enter برای ارسال
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // نمایش نشانگر تایپ
+        function showTypingIndicator(userId) {
+            const indicator = document.getElementById('typingIndicator');
+            const text = document.getElementById('typingText');
+            text.textContent = 'در حال تایپ...';
+            indicator.style.display = 'block';
+        }
+
+        // مخفی کردن نشانگر تایپ
+        function hideTypingIndicator() {
+            document.getElementById('typingIndicator').style.display = 'none';
+        }
+
+        // علامت‌گذاری پیام‌ها به عنوان خوانده شده
+        function markMessagesAsRead() {
+            const messages = document.querySelectorAll('.message.received');
+            messages.forEach(message => {
+                message.style.opacity = '0.7';
+            });
+        }
+
+        // اسکرول به پایین
+        function scrollToBottom() {
+            const container = document.getElementById('chatMessages');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // نمایش مودال چت جدید
+        function showNewChatModal() {
+            loadUsers();
+            document.getElementById('newChatModal').classList.add('show');
+            document.getElementById('newChatModal').style.display = 'block';
+        }
+
+        // بارگذاری کاربران
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/users', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    users = data.users;
+                    renderUserList();
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        // رندر کردن لیست کاربران
+        function renderUserList() {
+            const container = document.getElementById('userList');
+            container.innerHTML = '';
+            
+            users.forEach(user => {
+                const item = document.createElement('div');
+                item.className = 'participant-item';
+                item.innerHTML = `
+                    <input type="checkbox" class="form-check-input me-2" value="${user.id}">
+                    <div class="participant-avatar">${user.name.charAt(0).toUpperCase()}</div>
+                    <div class="ms-2">
+                        <div class="fw-bold">${user.name}</div>
+                        <small class="text-muted">${user.email}</small>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // ایجاد چت جدید
+        async function createNewChat() {
+            const type = document.getElementById('chatType').value;
+            const name = document.getElementById('chatName').value;
+            const selectedUsers = Array.from(document.querySelectorAll('#userList input:checked'))
+                .map(input => parseInt(input.value));
+            
+            if (selectedUsers.length === 0) {
+                alert('لطفا حداقل یک کاربر انتخاب کنید');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/conversations', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        type,
+                        name: type === 'group' ? name : null,
+                        participants: selectedUsers
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    // بستن مودال و به‌روزرسانی لیست
+                    document.getElementById('newChatModal').classList.remove('show');
+                    document.getElementById('newChatModal').style.display = 'none';
+                    location.reload();
+                }
+            } catch (error) {
+                console.error('Error creating chat:', error);
+                alert('خطا در ایجاد چت');
+            }
+        }
+
+        // نمایش مودال شرکت‌کنندگان
+        function showParticipantsModal() {
+            if (!currentConversation) return;
+            
+            loadParticipants();
+            document.getElementById('participantsModal').classList.add('show');
+            document.getElementById('participantsModal').style.display = 'block';
+        }
+
+        // بارگذاری شرکت‌کنندگان
+        async function loadParticipants() {
+            try {
+                const response = await fetch(`/api/conversations/${currentConversation.id}/participants`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    renderParticipantsList(data.participants);
+                }
+            } catch (error) {
+                console.error('Error loading participants:', error);
+            }
+        }
+
+        // رندر کردن لیست شرکت‌کنندگان
+        function renderParticipantsList(participants) {
+            const container = document.getElementById('participantsList');
+            container.innerHTML = '';
+            
+            participants.forEach(participant => {
+                const item = document.createElement('div');
+                item.className = 'participant-item d-flex justify-content-between align-items-center';
+                item.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <div class="participant-avatar">${participant.name.charAt(0).toUpperCase()}</div>
+                        <div class="ms-2">
+                            <div class="fw-bold">${participant.name}</div>
+                            <small class="text-muted">${participant.email}</small>
+                        </div>
+                    </div>
+                    ${participant.isAdmin ? '<span class="badge bg-primary">ادمین</span>' : ''}
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // ترک چت
+        function leaveConversation() {
+            if (!currentConversation) return;
+            
+            if (confirm('آیا مطمئن هستید که می‌خواهید این چت را ترک کنید؟')) {
+                socket.emit('leave_conversation', currentConversation.id);
+                currentConversation = null;
+                
+                // پاک کردن UI
+                document.getElementById('chatHeader').style.display = 'none';
+                document.getElementById('chatInput').style.display = 'none';
+                document.getElementById('chatMessages').innerHTML = `
+                    <div class="text-center text-muted mt-5">
+                        <i class="fas fa-comments" style="font-size: 3rem;"></i>
+                        <p class="mt-3">برای شروع چت، یک گفتگو را انتخاب کنید</p>
+                    </div>
+                `;
+            }
+        }
+
+        // مدیریت تغییر نوع چت
+        document.getElementById('chatType').addEventListener('change', function() {
+            const nameGroup = document.getElementById('chatNameGroup');
+            if (this.value === 'group') {
+                nameGroup.style.display = 'block';
+            } else {
+                nameGroup.style.display = 'none';
+            }
+        });
+
+        // به‌روزرسانی لیست چت‌ها
+        function updateConversationList() {
+            socket.emit('get_conversations');
+        }
+
+        // راه‌اندازی اولیه
+        initializeSocket();
+    </script>
+</body>
+</html> 

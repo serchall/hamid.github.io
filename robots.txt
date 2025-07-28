@@ -1,0 +1,19 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://your-domain.com/sitemap.xml
+
+# Disallow admin and private areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /uploads/
+Disallow: /node_modules/
+
+# Allow important pages
+Allow: /shop.html
+Allow: /courses.html
+Allow: /videos.html
+Allow: /chat.html
+Allow: /profile.html
+Allow: /payment.html 

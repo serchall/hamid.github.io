@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ورود / ثبت‌نام</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        .auth-card { 
+            max-width: 450px; 
+            margin: 0 auto; 
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        .tab-btn { 
+            cursor: pointer; 
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active {
+            background: #007bff;
+            color: white;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        }
+        .btn {
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #0056b3);
+            border: none;
+        }
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #1e7e34);
+            border: none;
+        }
+        .verification-code {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .verification-code input {
+            width: 50px;
+            height: 50px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+        }
+        .verification-code input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .step {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e9ecef;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 5px;
+            font-weight: bold;
+        }
+        .step.active {
+            background: #007bff;
+            color: white;
+        }
+        .step.completed {
+            background: #28a745;
+            color: white;
+        }
+        .loading {
+            display: none;
+        }
+        .loading.show {
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="auth-card card shadow">
+            <div class="card-header text-center bg-transparent border-0 pt-4">
+                <h3 class="mb-3"><i class="fas fa-user-shield text-primary me-2"></i>احراز هویت</h3>
+                <div class="step-indicator">
+                    <div class="step active" id="step1">1</div>
+                    <div class="step" id="step2">2</div>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <!-- فرم ورود -->
+                <form id="loginForm">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-envelope me-2"></i>ایمیل</label>
+                        <input type="email" class="form-control" id="loginEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-lock me-2"></i>رمز عبور</label>
+                        <input type="password" class="form-control" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">
+                        <span class="loading" id="loginLoading">
+                            <i class="fas fa-spinner fa-spin me-2"></i>
+                        </span>
+                        <span>ورود</span>
+                    </button>
+                </form>
+
+                <!-- فرم تایید 2FA -->
+                <form id="twoFactorForm" style="display:none;">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-shield-alt text-primary" style="font-size: 3rem;"></i>
+                        <h5 class="mt-3">احراز هویت دو مرحله‌ای</h5>
+                        <p class="text-muted">کد 6 رقمی ارسال شده به ایمیل خود را وارد کنید</p>
+                    </div>
+                    
+                    <div class="verification-code">
+                        <input type="text" maxlength="1" class="form-control code-input" data-index="0">
+                        <input type="text" maxlength="1" class="form-control code-input" data-index="1">
+                        <input type="text" maxlength="1" class="form-control code-input" data-index="2">
+                        <input type="text" maxlength="1" class="form-control code-input" data-index="3">
+                        <input type="text" maxlength="1" class="form-control code-input" data-index="4">
+                        <input type="text" maxlength="1" class="form-control code-input" data-index="5">
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="loading" id="verifyLoading">
+                                <i class="fas fa-spinner fa-spin me-2"></i>
+                            </span>
+                            <span>تایید کد</span>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="resendCode()">
+                            <span class="loading" id="resendLoading">
+                                <i class="fas fa-spinner fa-spin me-2"></i>
+                            </span>
+                            <span>ارسال مجدد کد</span>
+                        </button>
+                        <button type="button" class="btn btn-link" onclick="backToLogin()">
+                            <i class="fas fa-arrow-right me-2"></i>بازگشت به ورود
+                        </button>
+                    </div>
+                </form>
+
+                <!-- فرم ثبت‌نام -->
+                <form id="registerForm" style="display:none;">
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-user me-2"></i>نام</label>
+                        <input type="text" class="form-control" id="regName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-envelope me-2"></i>ایمیل</label>
+                        <input type="email" class="form-control" id="regEmail" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-lock me-2"></i>رمز عبور</label>
+                        <input type="password" class="form-control" id="regPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="fas fa-lock me-2"></i>تکرار رمز عبور</label>
+                        <input type="password" class="form-control" id="regPasswordConfirm" required>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <span class="loading" id="registerLoading">
+                            <i class="fas fa-spinner fa-spin me-2"></i>
+                        </span>
+                        <span>ثبت‌نام</span>
+                    </button>
+                </form>
+
+                <!-- تب‌ها -->
+                <div class="text-center mt-4">
+                    <div class="d-flex justify-content-center">
+                        <span class="tab-btn active" id="loginTab">ورود</span>
+                        <span class="tab-btn" id="registerTab">ثبت‌نام</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let tempToken = null;
+        let currentStep = 1;
+
+        // مدیریت تب‌ها
+        document.getElementById('loginTab').onclick = function() {
+            showLoginForm();
+            updateTabs(this, document.getElementById('registerTab'));
+        };
+        
+        document.getElementById('registerTab').onclick = function() {
+            showRegisterForm();
+            updateTabs(this, document.getElementById('loginTab'));
+        };
+
+        function updateTabs(activeTab, inactiveTab) {
+            activeTab.classList.add('active');
+            inactiveTab.classList.remove('active');
+        }
+
+        function showLoginForm() {
+            document.getElementById('loginForm').style.display = '';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('twoFactorForm').style.display = 'none';
+            currentStep = 1;
+            updateStepIndicator();
+        }
+
+        function showRegisterForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = '';
+            document.getElementById('twoFactorForm').style.display = 'none';
+            currentStep = 1;
+            updateStepIndicator();
+        }
+
+        function showTwoFactorForm() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('twoFactorForm').style.display = '';
+            currentStep = 2;
+            updateStepIndicator();
+        }
+
+        function updateStepIndicator() {
+            document.getElementById('step1').className = currentStep >= 1 ? 'step active' : 'step';
+            document.getElementById('step2').className = currentStep >= 2 ? 'step active' : 'step';
+        }
+
+        // مدیریت ورودی کد تایید
+        document.querySelectorAll('.code-input').forEach(input => {
+            input.addEventListener('input', function() {
+                const index = parseInt(this.dataset.index);
+                const value = this.value;
+                
+                if (value.length === 1) {
+                    if (index < 5) {
+                        document.querySelector(`[data-index="${index + 1}"]`).focus();
+                    }
+                }
+            });
+
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value === '') {
+                    const index = parseInt(this.dataset.index);
+                    if (index > 0) {
+                        document.querySelector(`[data-index="${index - 1}"]`).focus();
+                    }
+                }
+            });
+        });
+
+        // ورود
+        document.getElementById('loginForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            showLoading('loginLoading');
+            
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    if (data.requires2FA) {
+                        tempToken = data.tempToken;
+                        showTwoFactorForm();
+                        showMessage('کد احراز هویت به ایمیل شما ارسال شد', 'success');
+                    } else {
+                        localStorage.setItem('authToken', data.token);
+                        window.location.href = '/profile.html';
+                    }
+                } else {
+                    showMessage(data.message || 'ورود ناموفق بود', 'error');
+                }
+            } catch (error) {
+                showMessage('خطا در ارتباط با سرور', 'error');
+            } finally {
+                hideLoading('loginLoading');
+            }
+        };
+
+        // تایید کد 2FA
+        document.getElementById('twoFactorForm').onsubmit = async function(e) {
+            e.preventDefault();
+            
+            const code = Array.from(document.querySelectorAll('.code-input'))
+                .map(input => input.value)
+                .join('');
+            
+            if (code.length !== 6) {
+                showMessage('لطفا کد 6 رقمی را کامل وارد کنید', 'error');
+                return;
+            }
+            
+            showLoading('verifyLoading');
+            
+            try {
+                const res = await fetch('/api/verify-2fa', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code, tempToken })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    localStorage.setItem('authToken', data.token);
+                    showMessage('احراز هویت موفقیت‌آمیز بود', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/profile.html';
+                    }, 1000);
+                } else {
+                    showMessage(data.message || 'کد نامعتبر است', 'error');
+                    // پاک کردن فیلدها
+                    document.querySelectorAll('.code-input').forEach(input => input.value = '');
+                    document.querySelector('.code-input').focus();
+                }
+            } catch (error) {
+                showMessage('خطا در ارتباط با سرور', 'error');
+            } finally {
+                hideLoading('verifyLoading');
+            }
+        };
+
+        // ارسال مجدد کد
+        async function resendCode() {
+            if (!tempToken) return;
+            
+            showLoading('resendLoading');
+            
+            try {
+                const res = await fetch('/api/resend-2fa', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tempToken })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    showMessage('کد جدید ارسال شد', 'success');
+                } else {
+                    showMessage(data.message || 'خطا در ارسال کد', 'error');
+                }
+            } catch (error) {
+                showMessage('خطا در ارتباط با سرور', 'error');
+            } finally {
+                hideLoading('resendLoading');
+            }
+        }
+
+        // بازگشت به فرم ورود
+        function backToLogin() {
+            tempToken = null;
+            showLoginForm();
+            document.querySelectorAll('.code-input').forEach(input => input.value = '');
+        }
+
+        // ثبت‌نام
+        document.getElementById('registerForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+            
+            if (password !== passwordConfirm) {
+                showMessage('رمز و تکرار رمز یکسان نیستند', 'error');
+                return;
+            }
+            
+            showLoading('registerLoading');
+            
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, passwordConfirm })
+                });
+                
+                const data = await res.json();
+                
+                if (data.success) {
+                    localStorage.setItem('authToken', data.token);
+                    showMessage('ثبت‌نام موفقیت‌آمیز بود', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/profile.html';
+                    }, 1000);
+                } else {
+                    showMessage(data.message || 'ثبت‌نام ناموفق بود', 'error');
+                }
+            } catch (error) {
+                showMessage('خطا در ارتباط با سرور', 'error');
+            } finally {
+                hideLoading('registerLoading');
+            }
+        };
+
+        // توابع کمکی
+        function showLoading(elementId) {
+            document.getElementById(elementId).classList.add('show');
+        }
+
+        function hideLoading(elementId) {
+            document.getElementById(elementId).classList.remove('show');
+        }
+
+        function showMessage(message, type) {
+            // ایجاد toast notification
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+            toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            toast.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'} me-2"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+    </script>
+</body>
+</html> 
